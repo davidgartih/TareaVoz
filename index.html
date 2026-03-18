@@ -1,226 +1,596 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cámara con Voz</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background: #000;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        
-        #video {
-            width: 640px;
-            height: 480px;
-            border: 2px solid #333;
-            background: #111;
-        }
-        
-        #canvas {
-            width: 640px;
-            height: 480px;
-            border: 2px solid #333;
-            background: #111;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        #controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background: #007acc;
-            color: white;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background: #005999;
-        }
-        
-        button:disabled {
-            background: #333;
-            cursor: not-allowed;
-        }
-        
-        #status {
-            padding: 8px 16px;
-            background: #333;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        
-        .listening {
-            background: #ff4444 !important;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
-        h1 {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enseñanzas en el Camino de la Vida — Luis Zelaya Moncada</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --tq-deep:   #012a2e;
+  --tq-dark:   #023a40;
+  --tq-mid:    #045a62;
+  --tq-bright: #0899a6;
+  --tq-light:  #4ecdc4;
+  --tq-pale:   #a8e6e2;
+  --gold:      #d4a843;
+  --gold-lt:   #f5cc6a;
+  --cream:     #f0ece2;
+  --cobble:    #1a2a2c;
+  --road-top:  #0d1e20;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Rajdhani',sans-serif;background:var(--tq-dark);color:var(--cream);overflow-x:hidden}
+
+/* HERO */
+#hero{position:relative;width:100%;height:100vh;min-height:640px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#010f12 0%,#012028 30%,#012a34 55%,#023040 75%,#023a45 100%);z-index:0}
+#stars{position:absolute;inset:0;z-index:1;pointer-events:none}
+.star{position:absolute;background:#e0f8f6;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate;animation-delay:var(--dl)}
+@keyframes twinkle{from{opacity:var(--a1)}to{opacity:var(--a2)}}
+#moon{position:absolute;top:44px;right:130px;width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 38% 36%,#fffde8,#ffe97a 55%,#c8a000);box-shadow:0 0 30px 10px rgba(255,233,80,.2),0 0 80px 30px rgba(255,233,80,.07);z-index:2;animation:moonFloat 9s ease-in-out infinite}
+@keyframes moonFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#horizon{position:absolute;bottom:130px;left:0;right:0;height:160px;background:radial-gradient(ellipse 90% 100% at 50% 100%,rgba(8,153,166,.18) 0%,transparent 70%);z-index:2;pointer-events:none}
+
+.city-layer{position:absolute;bottom:130px;left:0;display:flex;align-items:flex-end}
+.layer-far {animation:scrollCity 26s linear infinite;z-index:3}
+.layer-mid {animation:scrollCity 14s linear infinite;z-index:4}
+.layer-near{animation:scrollCity  6s linear infinite;z-index:5}
+@keyframes scrollCity{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+#road{position:absolute;bottom:0;left:0;right:0;height:130px;background:linear-gradient(180deg,var(--road-top) 0%,var(--cobble) 100%);border-top:2px solid rgba(8,153,166,.3);z-index:6;overflow:hidden}
+#road::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0px,rgba(255,255,255,.02) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,transparent 1px,transparent 18px)}
+#road::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 0%,rgba(8,153,166,.08) 0%,transparent 70%)}
+.dash{position:absolute;top:54%;height:4px;width:65px;background:linear-gradient(90deg,transparent,rgba(212,168,67,.6),transparent);border-radius:2px;animation:dashMove .5s linear infinite}
+@keyframes dashMove{from{transform:translateX(0)}to{transform:translateX(-95px)}}
+.speedline{position:absolute;height:2px;background:linear-gradient(90deg,transparent,rgba(78,205,196,.25),transparent);animation:slMove var(--sld) linear infinite;animation-delay:var(--slDl)}
+@keyframes slMove{0%{left:110%;opacity:0}5%{opacity:1}95%{opacity:1}100%{left:-20%;opacity:0}}
+.lamp-post{position:absolute;bottom:0;width:5px;background:linear-gradient(180deg,#1a3a3e,#0d2022);border-radius:3px 3px 0 0}
+.lamp-post::before{content:'';position:absolute;top:-13px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,67,1),rgba(212,168,67,.2));box-shadow:0 0 10px 4px rgba(212,168,67,.45)}
+
+#scene{position:absolute;bottom:42px;left:50%;transform:translateX(-50%);z-index:10;animation:sceneFloat .2s ease-in-out infinite alternate,sceneVibe .09s linear infinite;filter:drop-shadow(0 0 14px rgba(8,153,166,.35))}
+@keyframes sceneFloat{from{margin-bottom:0}to{margin-bottom:4px}}
+@keyframes sceneVibe{0%{margin-left:0}33%{margin-left:.5px}66%{margin-left:-.5px}100%{margin-left:0}}
+#headlight{position:absolute;bottom:102px;left:calc(50% + 46px);width:270px;height:52px;background:linear-gradient(90deg,rgba(240,236,226,.5) 0%,rgba(240,236,226,.09) 55%,transparent 100%);clip-path:polygon(0 35%,100% 0%,100% 100%,0 65%);z-index:9;pointer-events:none;animation:beamPulse .22s ease-in-out infinite alternate}
+@keyframes beamPulse{from{opacity:.8}to{opacity:1}}
+.exh{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(78,205,196,.5),transparent);pointer-events:none;z-index:9;animation:exhFade var(--exd) ease-out forwards}
+@keyframes exhFade{0%{transform:translate(0,0) scale(1);opacity:.6}100%{transform:translate(-75px,var(--exy)) scale(0);opacity:0}}
+#wheel-r,#wheel-f{animation:spin .35s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+#hud{position:absolute;inset:0;z-index:18;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:26px 32px}
+.hud-top{display:flex;justify-content:space-between;align-items:flex-start}
+.hud-speed{text-align:right}
+.hud-speed .num{font-size:50px;line-height:1;color:var(--tq-light);opacity:.6;text-shadow:0 0 18px rgba(78,205,196,.3)}
+.hud-speed .unit{font-size:11px;letter-spacing:4px;color:rgba(78,205,196,.3)}
+.hud-bottom{display:flex;justify-content:space-between;padding-bottom:140px}
+.hud-stat{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(78,205,196,.28)}
+.hud-stat span{color:rgba(78,205,196,.52)}
+
+#hero-text{position:relative;z-index:20;text-align:center;margin-bottom:160px;padding:0 20px}
+#hero-eyebrow{font-size:11px;letter-spacing:8px;text-transform:uppercase;color:var(--tq-light);opacity:.8;margin-bottom:14px}
+#hero-title{font-family:'Playfair Display',serif;font-size:clamp(30px,5.5vw,68px);font-weight:700;line-height:1.1;color:var(--cream);text-shadow:0 0 40px rgba(8,153,166,.4);margin-bottom:10px}
+#hero-title em{font-style:italic;color:var(--gold-lt);display:block;font-size:.62em;font-weight:400;margin-top:6px}
+#hero-author{font-size:13px;letter-spacing:5px;text-transform:uppercase;color:rgba(240,236,226,.4);margin-top:18px}
+#hero-author span{color:var(--gold)}
+.scroll-hint{position:absolute;bottom:148px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.4;animation:hintBob 2s ease-in-out infinite}
+.scroll-hint span{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--tq-light)}
+.scroll-arrow{width:1px;height:26px;background:linear-gradient(180deg,var(--tq-light),transparent)}
+@keyframes hintBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+
+/* Comayagua clock widget */
+#clock-widget{position:absolute;top:36px;left:36px;z-index:20;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:5px}
+#clock-face{width:52px;height:52px;border-radius:50%;border:2px solid rgba(212,168,67,.5);background:rgba(1,32,36,.85);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 14px rgba(212,168,67,.15)}
+.clock-hand{position:absolute;bottom:50%;left:50%;transform-origin:bottom center;border-radius:2px;background:var(--gold-lt)}
+#hand-hr{width:2px;height:14px;margin-left:-1px}
+#hand-mn{width:1.5px;height:18px;margin-left:-.75px}
+#clock-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(212,168,67,.45)}
+/* 12 clock marks */
+.clock-mark{position:absolute;width:1px;height:4px;background:rgba(212,168,67,.3);transform-origin:bottom center;bottom:50%;left:50%;margin-left:-.5px}
+
+#vignette{position:fixed;inset:0;z-index:99;pointer-events:none;background:radial-gradient(ellipse at center,transparent 36%,rgba(0,8,10,.7) 100%)}
+
+/* SECTIONS */
+.section-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--tq-bright),transparent)}
+section{position:relative}
+.sec-label{display:block;font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--tq-light);margin-bottom:18px}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(22px,3.8vw,46px);line-height:1.2;margin-bottom:22px;color:var(--cream)}
+.sec-body{font-size:16px;line-height:1.85;color:rgba(240,236,226,.68)}
+.sec-body strong{color:var(--tq-pale);font-weight:600}
+
+/* BIOGRAPHY */
+#biografia{background:var(--tq-deep);padding:90px 40px}
+.bio-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:280px 1fr;gap:60px;align-items:start}
+.bio-portrait-frame{width:260px;height:320px;border:1px solid rgba(8,153,166,.35);position:relative;overflow:hidden;background:var(--tq-dark)}
+.bio-portrait-frame::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(1,32,36,.85) 100%);z-index:2}
+.bio-initials{position:absolute;top:30px;left:0;right:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:80px;font-weight:700;color:rgba(8,153,166,.18);letter-spacing:-4px;z-index:1}
+.bio-cathedral-deco{position:absolute;bottom:0;left:0;right:0;z-index:2}
+.bio-name-plate{background:var(--tq-bright);padding:10px 16px}
+.bio-name-plate p{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--tq-deep);font-weight:700}
+.bio-name-plate span{font-size:13px;letter-spacing:1px;color:rgba(1,30,32,.65)}
+.bio-data{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin:28px 0}
+.bio-data-item{border-left:2px solid rgba(8,153,166,.35);padding-left:12px}
+.bio-data-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(78,205,196,.55);margin-bottom:3px}
+.bio-data-val{font-size:15px;color:var(--cream);font-weight:600}
+
+.estructura-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:40px;max-width:1100px;margin-left:auto;margin-right:auto}
+.estructura-box{background:rgba(8,153,166,.05);border:0.5px solid rgba(8,153,166,.2);padding:28px 26px}
+.estructura-box:hover{background:rgba(8,153,166,.1)}
+.estructura-box h4{font-size:14px;letter-spacing:4px;text-transform:uppercase;color:var(--tq-light);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.estructura-box h4::before{content:'';display:block;width:20px;height:1px;background:var(--tq-bright)}
+.estructura-list{list-style:none}
+.estructura-list li{font-size:14px;line-height:1.7;color:rgba(240,236,226,.62);padding:5px 0;border-bottom:0.5px solid rgba(8,153,166,.1);display:flex;align-items:flex-start;gap:8px}
+.estructura-list li::before{content:'→';color:rgba(8,153,166,.5);flex-shrink:0;margin-top:1px}
+
+/* QUOTE */
+#quote-section{background:var(--tq-dark);padding:80px 40px;text-align:center;position:relative;overflow:hidden}
+#quote-section::before{content:'"';font-family:'Playfair Display',serif;font-size:280px;position:absolute;top:-40px;left:50%;transform:translateX(-50%);color:rgba(8,153,166,.06);line-height:1;pointer-events:none}
+.quote-inner{position:relative;z-index:1;max-width:760px;margin:0 auto}
+blockquote{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(18px,3vw,32px);line-height:1.6;color:var(--cream);margin-bottom:24px}
+blockquote em{font-style:normal;color:var(--tq-pale)}
+.q-attr{font-size:12px;letter-spacing:5px;text-transform:uppercase;color:rgba(78,205,196,.6)}
+
+/* PRINCIPIOS */
+#principios{background:var(--tq-deep);padding:90px 40px}
+.prin-wrap{max-width:960px;margin:0 auto}
+.prin-item{display:grid;grid-template-columns:72px 1fr;gap:28px;padding:32px 0;border-bottom:0.5px solid rgba(8,153,166,.12);align-items:start}
+.prin-item:last-child{border-bottom:none}
+.prin-icon{width:58px;height:58px;border:1px solid rgba(8,153,166,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(8,153,166,.06)}
+.prin-content h3{font-size:19px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tq-pale);margin-bottom:8px}
+.prin-content p{font-size:15px;line-height:1.8;color:rgba(240,236,226,.62)}
+.prin-tag{display:inline-block;margin-top:9px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tq-light);background:rgba(8,153,166,.1);border:0.5px solid rgba(8,153,166,.25);padding:3px 10px;border-radius:2px}
+
+/* FOOTER */
+footer{background:#010c0e;padding:36px 40px;text-align:center;border-top:0.5px solid rgba(8,153,166,.15)}
+footer p{font-size:12px;letter-spacing:2px;color:rgba(240,236,226,.22)}
+footer span{color:var(--tq-light)}
+.footer-skyline{display:flex;justify-content:center;margin-bottom:16px;opacity:.22}
+
+@media(max-width:700px){
+  .bio-grid{grid-template-columns:1fr}
+  .bio-portrait{display:none}
+  .estructura-grid{grid-template-columns:1fr}
+  .prin-item{grid-template-columns:1fr;gap:12px}
+  #biografia,#principios{padding:60px 22px}
+  #quote-section{padding:60px 22px}
+}
+</style>
 </head>
 <body>
-    <h1>Cámara con Reconocimiento de Voz</h1>
-    
-    <video id="video" autoplay muted></video>
-    <canvas id="canvas" width="640" height="480"></canvas>
-    
-    <button id="startBtn">Iniciar Cámara</button>
-    <button id="voiceBtn" disabled>Activar Voz</button>
-    <button id="downloadBtn" disabled>Descargar Foto</button>
-    <p id="status">Listo</p>
 
-    <script>
-        let video = document.getElementById('video');
-        let canvas = document.getElementById('canvas');
-        let ctx = canvas.getContext('2d');
-        let startBtn = document.getElementById('startBtn');
-        let voiceBtn = document.getElementById('voiceBtn');
-        let downloadBtn = document.getElementById('downloadBtn');
-        let status = document.getElementById('status');
-        
-        let stream = null;
-        let recognition = null;
-        let isListening = false;
-        let hasPhoto = false;
-        
-        startBtn.addEventListener('click', startCamera);
-        voiceBtn.addEventListener('click', toggleVoice);
-        downloadBtn.addEventListener('click', downloadPhoto);
-        
-        function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                .then(function(s) {
-                    stream = s;
-                    video.srcObject = stream;
-                    startBtn.textContent = 'Cámara Activa';
-                    startBtn.disabled = true;
-                    voiceBtn.disabled = false;
-                    status.textContent = 'Cámara iniciada';
-                })
-                .catch(function(err) {
-                    status.textContent = 'Error: ' + err.message;
-                });
-        }
-        
-        function toggleVoice() {
-            if (!isListening) {
-                startVoiceRecognition();
-            } else {
-                stopVoiceRecognition();
-            }
-        }
-        
-        function startVoiceRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                status.textContent = 'Reconocimiento de voz no soportado';
-                return;
-            }
-            
-            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'es-ES';
-            
-            recognition.onstart = function() {
-                isListening = true;
-                voiceBtn.textContent = 'Detener Voz';
-                voiceBtn.classList.add('listening');
-                status.textContent = 'Escuchando... Di "foto"';
-            };
-            
-            recognition.onresult = function(event) {
-                let transcript = '';
-                for (let i = 0; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                
-                transcript = transcript.toLowerCase().trim();
-                
-                if (transcript.includes('foto')) {
-                    takePhoto();
-                }
-            };
-            
-            recognition.onerror = function(event) {
-                status.textContent = 'Error de voz: ' + event.error;
-                stopVoiceRecognition();
-            };
-            
-            recognition.onend = function() {
-                if (isListening) {
-                    recognition.start();
-                }
-            };
-            
-            recognition.start();
-        }
-        
-        function stopVoiceRecognition() {
-            if (recognition) {
-                recognition.stop();
-                isListening = false;
-                voiceBtn.textContent = 'Activar Voz';
-                voiceBtn.classList.remove('listening');
-                status.textContent = 'Reconocimiento detenido';
-            }
-        }
-        
-        function takePhoto() {
-            if (!stream) return;
-            
-            ctx.drawImage(video, 0, 0, 640, 480);
-            canvas.style.display = 'block';
-            hasPhoto = true;
-            downloadBtn.disabled = false;
-            status.textContent = 'Foto capturada!';
-            
-            setTimeout(function() {
-                status.textContent = 'Escuchando... Di "foto"';
-            }, 2000);
-        }
-        
-        function downloadPhoto() {
-            if (!hasPhoto) return;
-            
-            canvas.toBlob(function(blob) {
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = 'foto_' + Date.now() + '.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                status.textContent = 'Foto descargada';
-            });
-        }
-    </script>
+<!-- HERO -->
+<section id="hero">
+  <div id="stars"></div>
+  <div id="moon"></div>
+  <div id="horizon"></div>
+
+  <!-- Comayagua real-time clock (top left) -->
+  <div id="clock-widget">
+    <div id="clock-face">
+      <div class="clock-hand" id="hand-hr"></div>
+      <div class="clock-hand" id="hand-mn"></div>
+    </div>
+    <div id="clock-label">Reloj · Comayagua</div>
+  </div>
+
+  <div class="city-layer layer-far"  id="city-far"></div>
+  <div class="city-layer layer-mid"  id="city-mid"></div>
+  <div class="city-layer layer-near" id="city-near"></div>
+
+  <div id="road"></div>
+  <div id="headlight"></div>
+
+  <!-- Third-person moto -->
+  <div id="scene">
+    <svg width="380" height="165" viewBox="0 0 380 165" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="190" y1="158" x2="20"  y2="100" stroke="rgba(78,205,196,.07)" stroke-width="1"/>
+      <line x1="190" y1="158" x2="360" y2="100" stroke="rgba(78,205,196,.07)" stroke-width="1"/>
+      <!-- Rear wheel -->
+      <g id="wheel-r" style="transform-origin:105px 120px">
+        <circle cx="105" cy="120" r="37" fill="#081e20" stroke="#1a3a3e" stroke-width="7"/>
+        <circle cx="105" cy="120" r="27" fill="none" stroke="#244448" stroke-width="3"/>
+        <circle cx="105" cy="120" r="6" fill="#4a6a6e"/>
+        <line x1="105" y1="91"  x2="105" y2="149" stroke="#2e5458" stroke-width="2"/>
+        <line x1="76"  y1="120" x2="134" y2="120" stroke="#2e5458" stroke-width="2"/>
+        <line x1="84"  y1="99"  x2="126" y2="141" stroke="#2e5458" stroke-width="2"/>
+        <line x1="126" y1="99"  x2="84"  y2="141" stroke="#2e5458" stroke-width="2"/>
+        <path d="M84 96 Q105 83 126 96" stroke="rgba(78,205,196,.15)" stroke-width="2" fill="none"/>
+      </g>
+      <!-- Front wheel -->
+      <g id="wheel-f" style="transform-origin:272px 112px">
+        <circle cx="272" cy="112" r="27" fill="#081e20" stroke="#1a3a3e" stroke-width="6"/>
+        <circle cx="272" cy="112" r="18" fill="none" stroke="#244448" stroke-width="2.5"/>
+        <circle cx="272" cy="112" r="5"  fill="#4a6a6e"/>
+        <line x1="272" y1="92"  x2="272" y2="132" stroke="#2e5458" stroke-width="1.5"/>
+        <line x1="252" y1="112" x2="292" y2="112" stroke="#2e5458" stroke-width="1.5"/>
+        <line x1="258" y1="99"  x2="286" y2="125" stroke="#2e5458" stroke-width="1.5"/>
+        <line x1="286" y1="99"  x2="258" y2="125" stroke="#2e5458" stroke-width="1.5"/>
+      </g>
+      <!-- Frame -->
+      <path d="M118 110 L140 70 L210 64 L255 84 L258 110 Z" fill="#0d2e32" stroke="#1a4a50" stroke-width="1.5"/>
+      <path d="M118 112 Q110 116 107 120" stroke="#123438" stroke-width="6" stroke-linecap="round"/>
+      <line x1="238" y1="82" x2="268" y2="110" stroke="#123438" stroke-width="5" stroke-linecap="round"/>
+      <line x1="245" y1="80" x2="276" y2="110" stroke="#123438" stroke-width="5" stroke-linecap="round"/>
+      <!-- Engine -->
+      <rect x="148" y="78" width="58" height="34" rx="5" fill="#081820" stroke="#1a3848" stroke-width="1"/>
+      <rect x="155" y="84" width="19" height="20" rx="2" fill="#040e12" stroke="#204050" stroke-width="0.8"/>
+      <rect x="180" y="84" width="19" height="20" rx="2" fill="#040e12" stroke="#204050" stroke-width="0.8"/>
+      <!-- Exhaust -->
+      <path d="M120 108 Q112 112 106 116" stroke="#0899a6" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="104" cy="117" r="5" fill="#0899a6" opacity=".7"/>
+      <circle cx="104" cy="117" r="2.5" fill="#4ecdc4"/>
+      <!-- Tank -->
+      <path d="M148 66 Q170 54 210 60 L210 78 L148 78 Z" fill="#0c2830" stroke="#1a4050" stroke-width="1.5"/>
+      <path d="M158 68 Q170 60 200 66" stroke="rgba(78,205,196,.4)" stroke-width="1.5" fill="none"/>
+      <path d="M152 72 L206 72" stroke="rgba(78,205,196,.15)" stroke-width="1"/>
+      <!-- Fairing -->
+      <path d="M210 60 L248 74 L252 88 L224 92 L210 78 Z" fill="#091c22" stroke="#163840" stroke-width="1.5"/>
+      <!-- Headlight -->
+      <ellipse cx="248" cy="78" rx="9" ry="11" fill="#f0f8ff"/>
+      <ellipse cx="248" cy="78" rx="6" ry="8" fill="white"/>
+      <ellipse cx="248" cy="78" rx="13" ry="15" fill="rgba(200,240,255,.12)"/>
+      <!-- Taillight -->
+      <rect x="124" y="64" width="16" height="8" rx="2" fill="#008898"/>
+      <rect x="126" y="66" width="12" height="4" rx="1" fill="#4ecdc4" opacity=".8"/>
+      <!-- Seat -->
+      <path d="M148 68 Q175 58 210 64 L205 74 Q175 68 148 76 Z" fill="#061418" stroke="#0e2830" stroke-width="1"/>
+      <!-- RIDER back view -->
+      <line x1="174" y1="92" x2="160" y2="118" stroke="#061018" stroke-width="9" stroke-linecap="round"/>
+      <line x1="160" y1="118" x2="166" y2="118" stroke="#0899a6" stroke-width="4" stroke-linecap="round"/>
+      <line x1="184" y1="90" x2="172" y2="118" stroke="#061018" stroke-width="9" stroke-linecap="round"/>
+      <line x1="172" y1="118" x2="178" y2="118" stroke="#0899a6" stroke-width="4" stroke-linecap="round"/>
+      <path d="M155 90 Q162 64 178 58 Q192 54 202 60 Q212 66 212 82 L205 94 Q190 100 170 98 Z" fill="#081c24" stroke="#103040" stroke-width="1.5"/>
+      <path d="M178 60 Q184 62 190 64 L190 94" stroke="rgba(78,205,196,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <rect x="157" y="76" width="12" height="8" rx="2" fill="rgba(8,153,166,.25)" stroke="rgba(78,205,196,.4)" stroke-width="0.8"/>
+      <rect x="203" y="74" width="12" height="8" rx="2" fill="rgba(8,153,166,.25)" stroke="rgba(78,205,196,.4)" stroke-width="0.8"/>
+      <path d="M162 82 Q170 76 210 74" stroke="#061018" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <path d="M202 74 Q220 72 235 76" stroke="#081c24" stroke-width="6" stroke-linecap="round" fill="none"/>
+      <path d="M200 78 Q218 76 232 80" stroke="#081c24" stroke-width="6" stroke-linecap="round" fill="none"/>
+      <ellipse cx="234" cy="77" rx="6" ry="4" fill="#0c2028" stroke="rgba(78,205,196,.35)" stroke-width="1"/>
+      <!-- Helmet back view -->
+      <ellipse cx="184" cy="58" rx="20" ry="19" fill="#061018" stroke="#103040" stroke-width="1.5"/>
+      <path d="M168 52 Q184 42 200 52" stroke="rgba(78,205,196,.4)" stroke-width="2" fill="none"/>
+      <rect x="179" y="70" width="10" height="4" rx="1" fill="#040c12" stroke="rgba(78,205,196,.2)" stroke-width="0.6"/>
+      <ellipse cx="167" cy="58" rx="4" ry="3" fill="rgba(8,153,166,.3)" stroke="rgba(78,205,196,.45)" stroke-width="0.8"/>
+      <ellipse cx="201" cy="58" rx="4" ry="3" fill="rgba(8,153,166,.3)" stroke="rgba(78,205,196,.45)" stroke-width="0.8"/>
+      <path d="M168 64 Q184 70 200 64" stroke="rgba(78,205,196,.22)" stroke-width="1" fill="none"/>
+      <ellipse cx="185" cy="152" rx="105" ry="8" fill="rgba(0,0,0,.3)"/>
+    </svg>
+  </div>
+
+  <div id="hud">
+    <div class="hud-top">
+      <div></div>
+      <div class="hud-speed">
+        <div class="num" id="spd">138</div>
+        <div class="unit">km/h &mdash; ritmo de vida</div>
+      </div>
+    </div>
+    <div class="hud-bottom">
+      <div class="hud-stat">Ruta: <span>Comayagua, Honduras</span></div>
+      <div class="hud-stat">RPM: <span id="rpm-val">8,100</span></div>
+      <div class="hud-stat">Marcha: <span>5ª</span></div>
+    </div>
+  </div>
+
+  <div id="hero-text">
+    <div id="hero-eyebrow">Luis Alberto Zelaya Moncada</div>
+    <h1 id="hero-title">
+      Enseñanzas en el<br>Camino de la Vida
+      <em>Cuando la moto se convierte en tu maestro</em>
+    </h1>
+    <div id="hero-author">Publicado por <span>Biblioteca Nacional de Honduras</span> &bull; 2021</div>
+  </div>
+  <div class="scroll-hint"><span>Explorar</span><div class="scroll-arrow"></div></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- BIOGRAPHY -->
+<section id="biografia">
+  <div class="bio-grid">
+    <div class="bio-portrait">
+      <div class="bio-portrait-frame">
+        <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEDAXwDASIAAhEBAxEB/8QAHAAAAQUBAQEAAAAAAAAAAAAAAwIEBQYHAAEI/8QAPxAAAgEDAwMCAwYFAgUDBQEAAQIDAAQRBRIhBjFBE1EHImEUMnGBkaEVI0JSwQixFiQzYtFy4fEXJ0NTkvD/xAAcAQABBQEBAQAAAAAAAAAAAAABAAIDBAUGBwj/xAAyEQACAgICAQIEBQIGAwAAAAAAAQIDBBESITEFQRMiMlEGIzNhcRSRFUJDgaGxcsHh/9oADAMBAAIRAxEAPwDU4iaWCc9qRFRD3pxnCw3GK9Dc14ACKSPvUNDtjkdq9jPzUhe1Li+9RCOl7Cjwg0IdqNBQEOFpzAKbrTmCihbHSAU7gpqnandt2FIchx3BFR97EpbNSPvTS7UkHiqeXHlE0PT5asI5RtanCH5aA33sUVAdtYnhnRpjDVp9kTY9qjtDtjcXRkb96d63GzR9qLohWFBkAGhy3LsvqXCh8Sx2ybVAHij7ajDqcMSFmOAPeoPVPiD01YsYZtXtfXAyIVkBc/gBVqLT8GNKqbeyz3YUKc4qAvnjUnOKgdS+IOh3WhXGp6Vq1lcLbIZJozJtdVHcYPOawDXPjdrEWrXEtpFFPYrKTAXYgup7Z/L3p3wZT6SJK8iqj62btq9wCxVFzUZ9illRpAygDvzWF3nxr1DUrpFvrS2gshktBC7KZDjgM3fH081Mw/Fbp6LRnliss35OxBIMpEoBJKgce3fnmh/SyXku/wCPVKPGv/klPiA956voRyNj6GmnSdukUyetKm7ucmso6j61u9Vm3/aHgjVuyHBI/KoT+M3JcNa3UsbeAz5/Opf6OUkRR/EdUfbZ9axbRCuMYx4pldcuAKynoX4lQ2tounX778LlS8nzfhz3q79NdUadrIDCWOKUEZRmrOtonB9o1cf1Cm9JqXZqfQcB2BiDnPNXZl2rVG6Y1zTLa0jSK5tnnlcrEplABPufYCrbbXy3FqWMsTnaCDGwIwRnx+dXqE4VHOZkvi5HRC9Sy7YyKzPWX3ytVw6qvBuZc1RbyTc7HPGaz7pcmd36HifDqTaI6cDNMJzjNPrgjNMJ8c1X0dLBDWXvTeSjTHnFBftTkiXQFgCa8KClnFJzzRSBo824NekYpS4ruKkSGMRXV62M14DSAFWu3V4O1eGmsdEcRvxzR42BpnGDijxkg0B+x2DilA8UFTRM0go1mM9qWScUOMcUQd669o+bginC1yn5q8HIrlPzUhe45T/FKj+9SEPGTS4u9Fjh2DxRoaAo4o8PemiHCmnMJNN1pxBREPEOVp1CcCmqDA4pxFSY5DxORRBEHXkUOLgU5iPGKjkkySMnHtERexBH4FJhXIpzqS4P503t6w8iGpnR402602DuLcSKQRUTq8sOk2El5cZEaDgKOWJ7AfUmrDgVg/xk+IRtuoX6cltXikspmcMwwkqmM7CMd/6hUMYOT6LUcjh1JlO+I/XutX+v3Nut09vpMce6SyRxDO69shjnIz7VmcnU1lbTvc6XbzxXzsGZ55N4JHHPHtTTrfqN724kNzEnrqSUlTBGGIOPw7/rVNmup53ypH5CtiqlcfBg5ebJyaiyzdSa/qGq3Ly3u0NLyyxMcNwAAf0qDkLNuEwxnxmugt72WVQFYBu1TNp0xqF3Kg9BmLnAwKmeoooLnYyvyJCDgFyR2oaISfk3KM/lW09M/CkzWwa/njgJPOeSBUxefDfpi3iIRLyaUZAXIAP51DLJrXuSrGm/Y+d7yJwpA5pmZZkbIJX6GvoL/wCmun/Z3DIdzfdIP3apHUfw9urN32IHHdSBnNKGVXJ62CWLZFbM4S+kVcMCceafaVrT+uqzTvHGOCyk5Aot5o09mx9SBlHkEdqip7CRD6kR3DPb2qwkpIg5Sg9l50LWwvyJcTK8mQksZw49snParhoWrSXBguNDa7guIWUSiS+MYkbtlccZB/L8axeFmQASjz4p5Z6pc2jpNFK4VDgDP3abKpNaLNGU4TTl4PqDpvrCfWbaWz1L5dSs39KcgfKxxkEH3x/saeTS8msI6E6yu4by5a4tHu0kkRpp0Pzxqp7lfI5NbTBPFeW0dzbyCSGRQyOp4INc/lUuqZ7B6DmV5eNFxfaOlOSaZzdqdPwDTSY8VWOhihtLTdyKPL2oDgUUOYF2rzNesvOa8AOaekRM7dSsik4rqfoaemuXzXma9XzQYQikdqVxQ070pjxTWFBUwKKncU0BI5pxEwpo9scjtSqQpFKyKSCjW4zSx3zQ4hxSz3rsD5wCqcCuHL0kZIpScHNJoDHKDiiRjBocZG2iIOaWhw6U5FFhJzQFGKPCOaDQhyp4o8JoAGKPDSEPUPFOIOabR9qcRD60GxyHiNTmE8imSU6hPv2qMk0C1JQVpnAMCnN9MhJGabRjNZWVrmbuJtVrYR87TjvXzn/qC6YutVmjmTTLpr2PtcIu5REM5bOck5x+Arf+oNQt9M0m4u7iZYkSMncfFfPWiXknVXVU+oya1qT2VnFvuI45SEkcnAT2AOM4HgVHTFqW0SXOPHUvcxO36C1q+n3SKVibszDv9at3S/wrYS77lPVA/tFa2sAmuC5VQWPHHAqag22yBYgAcckCrLypPwZvwIJ70USDo/T7eNd1mA4PkVJ2WmQWoxHCqj8KsNxlzk800kTk4qtOUpeS1WkvYDGdoAryTjnFK24PevW2lTzUDTZI2hvjLdq6++xm1KzxqZP6TtoiyIhyRUbq05mO1KauhutmbfEXTxdyhLW1AkfIO0VlGtW0mnT+lLGSB38V9FXGnmSzm3KPUYfKc8j61lPWGi3TrI8ihiDkEjmtLFt10UMqhPtGZ3GXxLGcr7Y7UzmLFSVOAeGFSdwrW5dSm6NuD9KYyqhVg2FPcHxWmuzM00xxoN7c6dqUd5D3AwefvDsR+lbv8JdQWfQXsTMJDA29OPuq/O0e+DkV89QuwI3c7fFaZ8DNSaPqG6tnDGK4jwhzwjDJx+YB/Ss/PqTrcjsPwl6hKnMjS30zZZjTObNOZOSaay1g6PYEgEg4oZHijN2oZooDEMgpG0DmiMeMUJnHapEiJiXxSCa9JFJNHQDm7ZrhXh9q4GgIKnvSsgnGKQjVzHFAKYZFBFGRfpTSJzTuKTimpDnIMBXpFJDZr0tzR0FGuRNxSz3oEec0Qd668+ckHXkV6O9JSlL3oMTDoOBiixUNeBS4zzSCO1Py0aI4NNQTijxE5pMQ7Bo8BOaar2pzDTQoeqcU4iPApoO1OIjxTWx6HY7U7ijZouPamkQyQKmLRBsoxW2Jy0VLUHlS9CtnGcVIxjKgj2pxrFiDJvAoNvkKB5FZGVXxsZv41qnStexkn+pK/um0G00XTBK95PMS6pj7gU5Az5Pj8KqnRFiNI6It7ZoViu7qT17keQTwFOfIFO/jdqpt/iJYxWzfznhVdxGfTJfgj2yAwNDineV1LZIzwKEnqKiR2alP+CWtEUAE96cEknvQIOUDYxRASTmjGA3Qpjx9abu2DRiM0GbAUnijKOhyG7uO1CLgDmvW570B+RioGh2jyc7l4bFNxFg7jRmQikvnGMVHOI4DcH+WewzVR6mhMkDfKTx7djVrlG4EE4qG1iMmIgeTQg3Fi47Rh2vac0bTKE5DEn8Kp80fpu2OfpWrdXQiGSTbg7l5z5rMtUjy25Acg8itrHnyiY2TXxZHljhlOceB7VZ/ha8n/F1gI35aUB157Dn/ABVaKADcxIYdj4NT3w2v49N60sLiUgRu5RifG4EA0cjutotejyUc2pt6XJf9n0Y7ZzTd6K30obVzOj3teALd6QRg0Q96Sxp8RsgL0BzTpgDQXjp5EwGc11ekAGvKDEeHvXg5rxjg1ynNJiDJjNKdCRQ070t3wOaawe50aEUdVIxQEkBNOYmBoDgg4FKBHmkEkUpRkZoh2a7Djml+aDGeeKJn5q64+dEHXtXuTkYpKn5aVH3pCDrkgZosQ5pIPAr1DzQCOaPFjNNgTiixUGIeDijwmmy8Yo8VBhQ8UinEFNE7CnVueaaORJ2aZYGpiEYUfhUdYqNoNSUX3RUsVpEcnsTcxh0PFQ8kZRzxU+ORzTG8t85K8GqmXVyW0X8K/g+LPlv4oaX/APd8xFmkEMP2ncT2DcKuP1p9pi7Wyw/CpP4rxw2fxEvtQuj6UQsogztwDgntWY3XxI06KaUW4d0HC9uaoqDm1oszsUZPZqvBAC9qTzntVO6N6tj1WLeTg/2nvVpa8jOClWVWkSRnyQ4mlSFf5jAeeah9Q1nToVbfcxjHgtUJ1pcztC6wyNnwBWSanpXVF1LIY3l2YJ+c7Rj88VMq1IisslHwajqfXWlWOVkOfbmmUfxC0x2DKylfOeMVl9r0Nrt2okd4ATzneSalbXoPU4oiXnHbkBM0yWNEhV9n2Ne0vqDT7+IMkiDPH3qdTzLj5CuKyWTRpLP0/wCGNdzOP+pFIoXn3XB5FT2l3mowoschAycbGfJqtZjNeOyzC3fkuLtkZprdIHXBGRTGXVYLdglzII2xnBPenLXkHphsttIyDtODVKyqS9i5XNPozT4jRtHJwMKASDWYXom3NKqfK1at8TLoy27JbQPKxzgBc5rMZor1UZ5LSZAeCShxWpiJqtbMnN1z0iMCho8sSVzQ09ON/UBJKsGXFDdn9UosUhB4+6akpuntdtbJLy60u7htXHErxEL+tTSa8MrwUk9xPozp4T3nTmn35iYLPbo4PfuKO6kDsasn+nJbTXvhDpuSGltGe1l47MrHH7EVcLzpW3ccIp/Ksqfp89txPUsL8X48q4xtWmkjJiPpSNtaBe9IqAdqY48VXdR6du4ASgLAeMVBLHsh5Ru4/rWJkfTMrczbeabtLyae3tncRHDxsPyqPdCDUWjRUlJbTOLZNJJ5rsYrw0gnhxXDGaS1eLTWIcJ3r2QBh3pMXNeSnB4oewPc5E9qcwgimscuDinUL5oILYZjS1JwOaCzc0tX4pwka/COaJjmhRnilq3OK6w+dkOF+6K5Thq8Q8UofezSEOEPyilpSE+6KWvegEOO1Gt/vCgZGKLC3IoMQ8o0VNlbPmjwnJxTfI5DtOQKcQggg0K3jJAp0y7Y6coh2S9iwKcVIREYqE0uTwTUxGaeiOSHINMr7U9Og/lz3cSv/bnJ/Sob4japcaV0pdXNtbXVw/AItxllXyf0rONL6x0azv4bW7S4t5JiArNAzKSeBlgCKbL7D4L3Kp/qcSHUdXslW5FvEIclZVZfUOeOMZIFYbp3wz9Z2kOqM0JJKlI/Hgc1uf8AqGNrq17o99bypJGEaOQA8qc+RWO6r1ebRvslqG9JDsLA4qCOovSRZepfNIsOhdOxaVb/ACO5ZO7Fxn/arfoe+ay9VyGIODsOfzrP9EmudSs3nUv6W4qz+rkHAz5q39KNd/wT7SyMA+fTycEDt/imXarW2WqeUuonmuRbQWyNxJ+6ahIrcPI0k5DY7AnNSjzveerG5/5hHwVPcr70y/m2NxvaMurjAOPu/WmKaJZQe9MiL2/v7Us8bBUXsoXGB7mvLHWNSvJhFD6c2FLErnj6HOKmf4epLMSTvGGzzkVIaRp2n2sLFFEbN32jvUnOOuyGVU97TIGyujd3a288W1s9/Y1LW9lEWLiJVYeW4FPltbaSVfSj5BznHNHktojMRhvlHCjtmoHZ9iVRa8kZKqPa7Silz/UUGAKZywyOBGJcJ5+Uf+KnpLGWXv8AIijtUZeJ6ZI9qqXT09lqmKZWtd0uAQb8lsE/e5BrP7fVIoZrmDUIRtAPpGEkEnPnJrUr5FuLZ4WJwwxx4rM77QJotUdGBIAO1iPBIp+Je0mpMjzMVzacSX6RvNDM3r31r/Niyy78sMeDz5qbuta1W6YXBYLYv8qQFQVKfUfWq9aWFqDa2NxcLF6smfmOOByR+dXfUbKCTSWS2A+QAjHkA0LPzHyZcxKlSuL8lv8A9NX2fS5uodAiT043mj1GAZ42SLtK/kU/cVsMorJvhHBGnUUc653CyaNyPbcpH75/WtYY57VqUS5QRkZlaruaQGRAfFAktIpAQ6A5p4VJFe7D3qTiivGyUHtMruo9O21whAQduKpGv9INHuaFcH2Fau447UCaFZFwyg/jUFmJXYjawPxDlYj1vaPnq9sp7VyssZGPOKaGtv6g6bt7yFisYyRWUdSaHcabMSEJjz7dqx8jFnT37HofpPr1OeteJEITSec17Xeaqm7sJE1KYgnkUhCAKQ7EeaQAoT/ejRAgjmm0cuadQtk0Egti2ODzXo7UiXvXqnikxJmzQ16VG+kxHFKzl811h87hkHFLUYPevFI20oDJpDg6H5aWh5oajgUtODQAF5o8AJNCXmnlsnNO47DsPFHmjou09q8TC0ov9acopBXY/szkU8dcpUfZOP3qTj5SkxPpjK2kMVzjxmrBbSB1BFQN1EQd47inml3PGwnFM8Ba2TFzDHdWstvKAUlQqwP1FZfBE9pM9pKg3xOVYEeQa1KNwRUBr3T/ANsvPttqwWRh86ngN9aLQxPRl3xp021n6OW6t4I45UmRwyoATnII/wBq+eLTpmOWW4a6lG1nzgivq34j6PdL0RcxzoqqroQ27P8AUKxe70mEMfmzz/SKpZEnCfRoUJSiV/TLWKKNbaEYjUbVA7c96vFzD9m023gT5UWMHHtURZaakc8SxgkZySasNygcZmJI24FQWS+ItF+pcWUZ45xqQuY5MMDjJ9vandxqEQKrOgXPkDIoWoK0d5hPuk80NjFKwhc7SOxqvHzotSgm9khA0bxiRJkMZ+uMUWKa3T70pb6AUrTLJFiUSKCO9PpLKI4Kw/pVhQa8EDhHYyFxK4P2aH0x7k80+sxtT58Fz3o8UDQ+BtxjFR1zMYZG+YCg4a7YdLwhzd3bCL0xx7moK/feDkjtSL27YknPFMDMzcgYqneiapaPckEAYINJexjuJ1PHY96XE2/OQc0aI7ZRjvVXeiwmUPUdJluepxDMPltwdpA9+QavPT6SC39KXBwhGcfSmOhiTUOq5ZZU9OGBNhfHDc0/1u6tdLWZYHZpGycnjA81oq1fBUfcZWm57Jv4Ua/Zx9efwD1QJpbAyD6kP939Ofyra4oie9fFnwf195/jjZXfi5n9BCD2U8D/AG/evuGOPauPNaOOuMEjCyrvi2OSArHiuI4o7YHFAlOCasIqpgjg8GklBjuKQ5Oc14CfNOYTmX3FQ+u6NDfwMCo3Ee1TWc12KZKKktMlpvnRNTg9NGDdV9OT6dOzohMeeR7VWvNfReu6RDqFswKgsR+tYr1boMumXjuqH08/pWHl4jqfKPg9R9A9fjmw+HY/mRAqBSmQEUhODXM+DVI6g89Mr4o9uea6Ngy0uADfQE2Ll7V4CQK9uOMUgEYpARtEYpWMNSY2GKUpy1dWfPIdM47URDzyKSnbApagk0Ugh05XNLjXJryJDjmnMSfSnqIBUUdPIuBQkXntRsU7WhC811JI4pcdNZJEc2rFe9S9o4I5qHi8U/t5MEUBSQ/mjDp2qOYNbyggd6kom3Ch3UIdaaxJ+w7sLgOgyfFSCkEVWreUwTYPapu2n3jNJMEkVT43TmDoggZxJcxox+mSf8Vi0DLKuOOO9bf8XrB9T6CvliXdJBtnUD/tOT+2awOzkwgIOKpZMdyRo4T+XQ7urhLZ45CAEDYNI1rXrWCy4Xk+aideaSe2eJGw7D5SfBqi6pc6pFthuozuUY45B+oqOK4l5aT2yzpq9nK+6WZEOf6mAzQ76a0lPqQTKT34NZvb9Otqk8s18LmTLcHJG0ewqxaX0xJFEkGno0C5wzyOST+VCWP1tMfG7vvwXrRNWM9qrAfdO01OWt8jcE4qD0Kxg0u1EKyGU5yzN5NOptgb1I848gUFIa2iXuLtQpweAKrOpzjeWPJPanUtwGQ4Peoe+diS2e3YULHtCj0A3NKQoJ/ClsHT5SBXlqNwLYIPvRZBtYFicntVSxdEsZCRnAIIB80QluCTSVxgk9/ahPICMsR37VU0WIlh0m0Sa1ZlcDJ+YeaqnxEt5DbTwW4Ammh2Bv7V80m96gm0m4iG1jBLwSPB8U4kvjdOL2ZcqiHHvUnxHCMWSQg9SKP/AKZ+mb3UPiXE8cRMNk4kllK8Lg9s+Ca+22bFZH/pkudEuOk7hbGzS11D1mluveQMx2t/jHjFa1IRmugo7js5rIqlTY65LTQiRqbO3zUuV/FB71Noh0LUKRmuYA9q9VCRSSrA8ikDZwWvD3r0Zr3FIa2cAMVBdU6PDfWchKAtj2qdrmAZSpHBoSgpLTJsfInj2KcH4PnLXdNfTr54iCFzxUXMPNal8UdHAQ3CLyDmszdMjGK5zIpdU3E9n9Jzlm40bPf3G0UmDjNO7Z8sOaZvFg5FHtztNVzTY7uCNtAU5FLnOVFNwaIkjbY80dI2Y8V1sm41KQwAAZFdWls+eGxvDEcc05jhxThIx2FEEeKkS0DkIjQAUZAOK4DmlYxTgphUx+dLAoSnFGU0GE9C0RVrk5oyj2pvY5M8RcU4iO3HNIVaXsNIcmPIZeRTtXDVHxKaOpI7U0Au6h3jI70K2maF8NThG968kiV+QBmgwpjsvHc27xSDckilWB8gjBr5e1q2fStevtOOcW87Iuf7c8ftX01ChVRWG/HTTWserUv1GI76IEn/ALl4P+Kr5Mfl2WcWXGeikTzhu/FMru1Fy6OuCR7107ksSSBxXRXkMaiSdwiAc1Vi+y7JuT0hzaWix8Nhcn8qWV2MY1zz5po+v6Qi73lcjwpHeoa762sElIjEY8YL1O3tBjVNlgkufTGATxQbW7YTEkk7h2qpXXV9uZGcRFs8AIc00j6inlm/lWtxjz8nAqNRHuEo+S7icGbKHIY8jwK8uURss3B8Cofp+4ae5AbIB521L6i6RlQO5qKSBGQi3YA4PjivLl9hHbJ7UzgnKsxDY9qRfXIH/tUVi2ievyLubrYu0EbiOT7U0E7Me/Him0sy7jIe9JFwrAZAA/GqjiXYoLqR9awKsA22RWH61cOjdJOp3U106bbPT7dppTjgtg4H+aowm3SCKMFmZhge5rdH0xelfhHdCXAu7qLdMT33NgAflnFTY1HxZ9+ERZNzio1x8yejOPhprLdN6xBeLEXj2lJkU4yp7/vzW/aFrun67avc2EjMsbbHVl2lTjsRXzTaqVwR4qxaV1Hq+lWM4068FsjHfJhQSSBjualoyXU9Pwb/AKr6NHMipweprS/bRvrgk5pUa1gsXV+uPG8z6zdErjndxVp0v4garDGq3Po3AHGWGGP6VdXqFfhowLPwzlRXyNNmrqQPFJfBrPE+IzH72noR9JCP8U8tuv7Z/wDradcIPdGDU9ZlL9ylL0D1CP8Ap7/3RcfNemoOy6r0W6wv2r0W9pVK1LxTRTKGhlSQEZBU5qeNkJfSzMuxb6H+bBr+UErwmuyaSc5p5BogetLUXGlycZOKwq8UxXMkeCNpNfRmoRLPbMh8isQ6+042OomQLhW71l+oVbSmd/8Ag3NS5USZWeTXKcNSEk5xSgctWPo9CDscpQT3ogIxihkjPFJgRvtgh4JFSS9qBDHsAAFOkAxXXLo+dtnsYIPNGzSFFKNHYBa17ikrSqI6J1FXjFCoq9qGh4aM0dKax05Q80hDiPmjquabxmjIxpoUHQcUUUBfAogbFBjgqilgcUJGoimgIMpOKz/47aZ9u6QF6ibpLKUOT5CHg/7ir3LNDBA000ixxoMszHAArCvi58Zokgu9C6etI7hZVMU1xMuVIPHyj/NCa5R0Og+MkzOryJpbfchw6e1U+/tdYvbv0oZVjjAJOe/6UwmvtSL7/tcyk+AxFPNF1i6tJ/8Amz68RHJx8w/OqbplFbLcMqLkP9M6RsZlzqU1xO/fLvgD8qlxo2h2UGLW2t1I4LEZok6Lc26yxTfy3XIIPcVBSJ/PYM7FR4zTVJs042pIlIrKx9VRHCrufIXipAWMSrzGgJ9qHosYMYYEcjjin8kRyN1Qycthc0/JF+gLa59WAAY70nUJ/UQMe4r29nHKrx+dREsh9U5fIpy8FRvUg9pIXZgzDb3waTfuAAV7fWhWajcSzAtim2oz4TG7n2qOSLNcuwE1yOx/ah+qu04PjzTUHLEVO9GdNX3U2sw6bZKcscyPjiNfJNRKtylxRbdqhHlLwXT4C9Kvresfxy9jBsrI5QEcPJ4/IVffjnflNJt9PVv+tJlh9F5/3xV10LSbLprQLfS7IBYoVwT5Y+SayL4rXpveokjByIohj8ya1JVLHoa92UfSm8z1CM5eF3/YpykRRbiOwqHv7mSeVIIzhWPzY9qltSLR2wXHLVHWtmzyBh948CshI76yTfSHWlxsUltX+UOBtYnyPFT1nLviGF/EmmMlsY1QofmXzinElzKkKyoFIIw2R2NKUdskg+I93BOT3+vFD+1BuN7MfYUC3tpLs+pKcc+9StrbRRAFQo+oGf8Aeo2kibmBgNy33YmA/wC40/s3vrZw9vI8T/8AYxH+1HhjGOXIH4Up3hj/AKyfyqPk0+hPUlqS2ic03qnW7baJhHdJ5D8N+oqyWHVen3OFuUktX9nGV/UVnDX6o21gFJ7c96H/ABlA+0HcfwqzXl3Q/cx8r0PCyNvjxf7df/DYkuIp0DwyI6nypyKovxM09Z7N5AmTjP8AvUDa6rJEwkiZ4mznKNj/AOfzqUm6jW7sza6koIYYWYcfkw/zVp5kLoOElpmZjeiX+n5MbqnyS/uZXtAcg+9Kz7UXWITbalLHjgNxim6tWU1p6PSIS5RUvuEGaSQaUrZ8V4TQYdn0igoi8Uhe1KBwa6zZ86hRSqQpFK4oiFA80rIpFdRQ5MWKIpzihrS1ojwqUdDzQEoydqDEHRsUVHyeKAgzQ764WztXnY9hx9TTH8vYYrb0SSHnJNCnv7SHJknQfnVEvddnfcfUI9gD2quSatulbdKC31OapvLbfyouQxXLyzYbS/tLg7YZ0Y+2aTrerWWi6XNqOoTCK3iGWbzWSDqO3tIGd5djqOMGo2+udU660w6ZHfhbdJcuzjOeKX9Wl1IknhSUXJFe+JXxUv8AXZ57G0cwaaThYxwz/U/+KoSWeq3ziQ2txKpxl2GcCtr6Z+GOgaWwnuFa9n95OwNXOGztYUEcMMcagcKqgVHPMS+lbIYY7flnzn/A9Mh0ae+v5/TdfkjVf/2YzgjxVTaeEORgZFa/8eumBcaRJqtjCVubcbnCcb185H0r57m1KM24ydsoPIqSm5Wx2hltLrfZeul9QiRJ7aR8w7gyjPK574+mRn86mVNpBJu9NTnkE9jWaaDdStHPcjhMhAffH/zV2srmO80uNnYBlGODTEtTaLlEm4ItGmujAyggA/0iizXMbFkQ5kHYeKqg1Nol2LwAOTmgfxR1lLI68CjwRLKTJHUJVE+QceSKi3nQuRgD3oGo6pH6jZOSaiXuPUkIB/PNMaI0ietbqIM5LYPgVGXbtIe5yaDbMc5FKlk9S4jt4UaW4kYJHGgyzMewApvHb0iaM1FbY80LSr3VtRhsLGF5riZgqqv+fpX1P8OukrTpDQRAmJLuYBriXHJPsPoKifgx8Pf+FtJXUNTRW1a4UF/PpA/0D/NXm8IGea0cbH+GuT8mXk5bvlxj4RF6xcYic54ArCtalF5r9/OeyyhF/JR/kmtc6outlswDYPmsgudgncoPvuXJ9yeaizn8h0n4Zr/NlL9iP1RCzQoPJpzaxrGd6jkcAUidlNyBj7qmnNiueCOcVkHY972GtrZ3Uuzbc+TSEiAd4i38p+Cf804lfO2FTkDg106oqYA7eaQ5jaxZgxtuQIzgn3qUgBLcn5RUezF8SRj5xww9x70XUr5bSyZuN2P3oOOwwbXkLdalmYwQjO0cnNR11qDB9iEs58Co0XLxRADBnmPA9qkdNsxGokcZkPJY0eCQlY5dIEI53JyS87j/APgVIWVnsQNtJP14p5aRoiFlXv3ZqFdX9tCSC+9/YdhTfIRaxTdiBj8a9eGTYQUyp4PmmkV9PKfkjCr7ngCjG/wcI24juR2qJxHKTILWV9O5WNuRtyuTyB7VH5B7VNdRmCW3W5aMiVSF3qOMfWoFuAGHI96gfUtM2cazlWg8fPaubg0JJcGllyecUSwfSimlUhaJkV1jR87oUDg0vOaGKUCMUUIWDXtDzS1b3oj0tBEHNE80lWGAOaWDzSDsXGaMnagL3ohkWJN7kAD3pN6COIzVf6ruS8iW4+6o3H8acya1GJCkaFvr2qva3cs8zzlDhv2qjfkQa0mWaapJ7ZQ+qtX1BdU/humWrzzsMnH3QPcmu0PorUbqUXmrXjxuf/xxNx+dWjTrSKKR7pwC78lseKNea3FAuI+TnxVRLk+jQcmlqJGf8Dae7gSyTSgnsz1bdL0uz0y0WC1hSNV/tHc1AW+pXdzOgWAsCc7ferVah2iDyDBPipXFJEMpS92FhyVBo6BAcsK9gjO3OKHcA9hUHwt+RRkQfUsSyh43UPGykEHkEGvkn4t9F3Oj9Wj7Gjm1vDmI44B8ivr3UlBjIPes8+IWi/xLR3ZUzNbkyR/pyKqxnLHsbRdrqhdqMvBhD6ZFp2lx2XqZbb831ah2E0kEbRFlAB4zUt0rpLdT9cWumT7xZoTNdsPESct+vb86lPiLBptpqz3tnbx26MxLQqPkUE8Y9qvU8pR5Mn9WjjY96hT1tFUnvGJIyW48eKardSpkRgkmpCQ28g3IgG7nimszKg7YNTKRnPvsaZd5C8pI57Ub7RHHycY+hprdS4XPc0wJklkwAcU5R2RSs0Skupuf5cCM8jcKo5JP0r6T/wBO3wtfSETqvqWENqky7raBufs6kd//AFH9qg/9OPwkaIxdW9RQAsfms7d17D+8g/tX0XjYmBxj2q7RSo9szr73P5fY6c/Kag9VnEYNP7242rxVZ1WctuOe3NWJyG48NvsrevymV5Bk8Kay/cTLz4rRdQcsJnPYKazRZ45JH2k5yf8Aes3P/TX8ncfhyOpz/gXApa4dzk+KfpJsQ4GCaj5LhYF+UYY+KTHcM/zHyKyTrFFDxpMHOa99QuwJ7UyZypDe/YUG81SCzdImX1ZpOEjQ+frRW/YE2o9slS4jO7PFVzWb9Zr9YVffGh3HH7Cla084tS91PtOP+mnYf+aH0/YLGPtlyvzHlVNPWl2yvapykoRJbS7NgTd3XErfdX+0U7mv0i+VWGR3b2pqkk13IUhOEHBb2o0drbRMN381x79hUbl9y3Cviujz7RfX/wAkO6KAf1HgtRY4LW1XLkyyfWlPMRhV/QVyRKBvlP5UzkP+GeM7z8DAUeK9XagxnJpLygjao2ge1J3YobBxD5BBBAIPBBqv3yra3zQgYhkG5fp//jUwZDg4AJ8Zqr6hcy3F0zSZXacBd2Qv4VBYWcZNS6HQUhsGlMxBxQoX3qCTyODXrOM96au0aMWfTS+MUUUFaIDiutZ89IUTjtXgbivCflpINJeAoMppdCjomaciRBUNLBOaGh4zTKXUlEhRFzjzUdlsa1tjoQcnpEo0ixxl3baoHJqq9Qa965EEAKop5J806v7uWaLbuwPYVVNWjePcx/Ws6zLdj1DwW66eP1Fh02aOaMMGB/OjzOgQqwDKfBrN7DXGsdkr3CLG7YAZsZP0qyW/UEF0gTOHNMcE0TalsX1HcT2mnStaL6m0E4HcVRLHrDRLG3a51a7RJ8n5GParrcS4BIO7P71lHxc+HSawra3pUTLcKP50PhvqB706h8XqS6JLYtQ3E0T4Z9daD1PrdxZw3JiMMe5XKnaT271qFq28ZbG1eBjsa+dP9LNnFBDrjSRhZlZIjuHPmt9a4WK32ggADFSzW5FWMnJbZLLOrEIhFDuHVR3yapY17ZObdXHrbsKM1MLPKcCRst5pa+xNx0OL3BBJqv32WDLjipyQ5Xmo2/RBGxHf3qjk167JqpmeaXpFh0w2t3YIE95hYy39MQ5PP44/Sst68u0vNGF0jsxkcqTjAOPIraepLRNRspIXJU4O1h3FYh1np13a2CaeqepHHKxVgO30qxiWpw4fYrZsJOz4jfkrPROo7zLp93yEPyMe4FWC/wBPIjynz554qlWe/TdbhlcYjlOyT860OwfcqxMdy/0mppLsjqnuOity2UvYofwrWfgz8O7dLuHX+qbeVLVGDW9uV5kP9zA/01ZOgug7e09LWNSiWa6IDwwsvyx+zN7n6VdLGy1C8vpZLttsKnCIp7/U/wDir9FHhyI7Hvo0bTL6yuIV+yTRsqjAUHkfTFGnkAXmqDJYvEd8E7wSKeGQ1K2Gs3G9bPUUIfHyzf0v+PsauSg12U/hr2H9/LlsVXdVLBCM/eqZuW3MairiFpZQOTUL7LNT49lM6suP4fokrk/zJT6UY8kt/wCBmsvkLCdgmRt8jxWlfFaER2QuHIEFtII1JP3pCCWP5AAfmaynWtTXSLpbbUIZYHkQSLuX7ynsfwrLztuSivCO7/D8q44zsk9bf/Qd53YgvlifNEScRqCz7VA5JqAn6msIoTs+dvAAqBk1C91i5CKSkX9q9hVJVt+TWtzqoNKD5N/YtOp9Qgf8vp/82Y/1jsKL0xYOs76hdsXl/pz4pvo+lx28QYKCT5NTF1KLayJBxgUJSUflRJVROySsu9vb2Gl/L9s1FUODHEcn2J8U4+0S3cwtbY4A+8/hRUdYwyPBuZtvqHLH3+lSluqW8YihGCTyRTG9dFyutyfL7klE4jjFra9h3b3NHGIlCL8zHvTWDESYHLGjGVIE3M3zVC2WeOkGDCIb3Pz+BQXlaRvmIA9qZG5kmbgkfWncKiNd78/jTdi47CDAHtQ3lGcA01mu8tgEGhevk9qLGcR5IQ8bRk/eUiqzghsHuKndwcEHsRg1BcBzjkZ4qGwsULWxxAxU496Ue5ocZzRCC3IpkWWkz6dU/WidxQFIooPFdgfPgr6Ugtg0pe9JbvSHRCx8iiSOsce5zgDzTfcEUsewqvavqjXDNDCSEH71HbYq49k1cHN6JiTUVkVlQ/SmKyozFB3FRtmXJ+fsK9uXeBxcxjdt+8vuKy57m9yZocI19IfszYpheMrq0UmMMCBT+OaK4tvVjIIIzVf1oySwSNFyyc0FHiwLszOxsJbrry4sb1S9lbZZUI4DHtSeubm40eZZNIlxIvOxj8v4Ve5Gii0o6hLEgmlX5mA5OO1ZnrzPcSySTtls9v8AFX4qILZuK/cs/wAPOt4dXuksrwCG8Ucxt/V9V960e/uLW3sWnmZVQA5zXzl9gnWWO+iLRSRMGjdTgg/jUjqvVOu6hYLa3EudowzAY3fvQlFOOkCrIXmZYeg9dtbfrTqCGxAjSWVZQo7exrTbrWLhrUNGhcEc+4r500a7bSdetbtzhZZRFJ+Df++K3O1ugkfpsCTtyPqKbx4pBqmrG3og9O1J5ev7MTxPGCGAz2JxWoRzc5xWQ6lJeN1Tp9wImW3jnG5q1aGRBEpz470Iks0x+Zty5JwaaTtuUg9qG06gd6HLMCKZfBSRFB6ZF3kW5mCjiqV1PZR5dJU3xPncAPunwRWhOokQ1Xdftdw2qNxAz2rLhJ0z5FySVkOLMNvujb46s8N3JG8IBeJkB+fjg0++Gii66s07Sbthg3aRuDwcbuf2rSdIsoLiCWyucrKrlreQ+M+PwoMHR0dv1po2vwlIWju0kuY8ja4XJyPr2rZg1PTXgzNfDbibj6cAchBuowChNuQq0ze6eRuAsYPOFpLynGAcmtuOvYqNv3Dn09xVeeeSaKlqkvzSrlfANIs4QAGenqMGbA7VMov3I+SBSxqICf7RkH3HsajxcpAJLhudikqPc+KktSlSG3DMM5OMAZzmodImurlEMbRwRvkgjk4qvOGn0PjMqvxkXStN6U0y51qbdBbu05tlPzXMxHAP/b3z9K+Ydc16/wCpdbfUbzGMbI41+7EnhR9BWgf6nuo5L/q59MSRjFbBYkXPbjLH9f8AasytY/TRUA581i5FnzNHaenYsnXBS9lv+45jtIZOWFT+hWKQpu2gAnNR1lFvkRAOSasYbYqqOwFUJzfg6fGxIJ8tD+B8tjjApnrEpkeOAHh2wfwpUT45qOmn9TVkjzyATUK8mko/KTCFVXA4A7U4tjgbj3pkhzj2FF9TbyfFM2WFHRIiZYl9RjliOBTKS4aSQH7xJ7UxmuTK+0HNOImS1QSy43eFoDtEjEVgX1pzz4UUzudQknconC+wqOmupLmUkk4zRYsR845NJLQ1rfSHMYxyTzRA1Ny5PJrwuO+aDGcNDsSgDmowFSSVBC54zRfWDHA5zQVyqDPFRSXRLUvIaI84o6NtGKaRNziiO5VsVCTH06KIrcUOvS3tXZbPAAqtzXSGhqTxXTMFQsTjAzR2ORE9R6j6MH2aNv5j8flUNbxMIywGTTa8uDdX5lP3QTilm6dQRHIF+h81kWz+NPfsjRqhxQ8s5w4KdmHcUdpUzsJ/Gqlear9luBLIrJzyR2qTS4F1EkkUg58ilrXRM4tjkXY0y8EROLac8H+005dFb5o+S3geahdaUXOmyW0pG7Hyt9ad9K6t/A+loLrUY/tN827YB32gnH7VFbNwj0tv2HxrT7bGOu9Oa66Fre1lCHLbAR8v1qoJ0xfT6xDavG8YyDJvXG0eTWj2XxIDz5urBkh91OSKn7t9M13SmmtJVBZTtmXhlqtDPvx2lkV6T90CeNG1brltmb/Eu96ce2stF0S1SMWabZpwOZW96zW9WBH2qRmn3XE97pF+2mT7WMTkrJt5ZT5qja7dTSYiWQ/Mp9QKffwa2lNceS8Gcq5cuIDqPU7Y3SW8f8xI23SMP7h2A/CtW6C6stta0tI2cG6txg88kViMlnJ3AqX6INxpmuQzLnYxw4HtmoXPbL9VfFdG56jJHLZmSPvnP4GrPoGoLc6dE7MD8o81Q7y5b+HPNbKZCy5AFD6A1mSW3kinBimikI2HyPFKXyrZYcdo0x3zyO1DMy4wWqLW+LR4HFISUg8vuo7UkROBOQuSpANeNErklwM0CyJKg5p4Blc5qtbTyQYy0VvqHTLhbc3Vkm6SP5gq9zVVm1ayvNIu3uLhodThuFktQOARxwa0m8u7ezt2muHVY1GSSawLq7ULWfqK6vbLcsbn5VHb8cUsX8rafgkjhW5b3BeD6G1HW7fVtA07XdEuS93FGo1KGTgE4xx7ef2qc0uWKe1juVIO4Z79qwr4M/EWz0LUrrSdetFm0/UY9hJbGxh2Iq8p1bbdOw+rexyi0lfEA/qYE8Y/Kt/DsUVufgybsebl8NL5kaUJcnAp7aox5qK6XvbDWbFb2znWRSOVzyp9jU6WEcRbsAKvqaktoz7ITqlwmtNEVdSCbV4oO6xDeR9fFRvW3Ulh0roVzqt7Oke1TsXIy7Y4UfU1SuvviZpPSNxeMrpeai/aNG+WMeNx/wACvmnrvrfXOuNYJvLhvQz8sYPyqM8cVRyMyEFpeTYwPSrbWpzWo+33YLVNSn6h6jutWnJPqSF/1p5bQs+GpjaRLBAFAxUta8IBXN2WNvZ6VhYnCOmP9NXa+8+KkRJk0xj+RAB3osT4OagbNSMeK0OpZdq1Gaawl1SeY87FCiiXs+EJpjoMoaS4OeTJiiukxzXcUWKN+c5wKbz3LTyelDk/hTeWVpj9nhPb7zeBXGRLZTFCQWPdvJphZ0OxLHaKOQ0p/agb3nk3MSaFbwtK29+31p/DCSMIvHvTeSQfhtiYiF7DJpwA2Az8Vxkt4F4+Zh3NML69ZxgNhaCexzjxQ5muVXgc01a5aRsCo71Wd8KaldOte0j8/Si3oi4uT6HthDtG9+D4ptdTD1CoOeaXfXqQpsVhkjtUfblpDvNRPY/qL0PYz8wNLkOWoUfeimoxyPp4vz3r0Pmmsj4NepJk11zZ4HoeoahOqNSijjaxSZRcPGTsHfHvXnU2uLo+nPMqh5tpKqTgD6msd6P1m81PqvV76+Z2clY0B4wO/H0qtdb00i/Rhtw+LLx7F1hn2/I2eK9fEmdrkGozVpDbzLMDtU9/amsupwrHkTANVGPXktxhs7WEmZGUyKQfrUNpevvptwLaRzJEWwSP6KFqN48/9R2fjioe/KC3Kx43eTR5EvE0lXN0gcPuVhkHNRHVdy0D2gMpSMRkYz9areg9Rro+mtHcvvABKAmqTr/VU+o3zSvIQucKo8Cp66nKSl9ink28U4fcv8mpoQQpG003h6pu9Oimt7a4IjlGGGe1Z0mtTlSkSvI2PFO9CnLXDz6jHIIApyDxk0+6UFH5+yvRGcpfJ0T/AMQb+XWLqwlR8uLULKfOcnH7VAxWwSNcwSyHPOxCaldCmtb2eaRkP8rmNDyCPrUrcX0EkW9VXcncVRjN8dHU0emxaVk+9kDDZXM06QJahFbuznnH4U8XSZIJOG5/CpTTNQt3mU7V4Bp7PeQb/urSb0aVOHTx3xE9K3snoSW9wGRkJGGGOPeoiW5ng15rqzEjiPhwikg/jUnLPayBQyDI8qxB/ahXF9a28BWOKNAT48mpHa5R4kD9OgpuT+knNK6rsrj+UZQkw4aN+Dmn6a4rXAiiG9j4Hesw1C4hm13R5EyHW8VflJGQfwBPgVO3uq/wXqnUHdF9MS8D2/DNOi2tGbbi6k1A1jTbmTYHmOzPg0PWeo7KxhZpZQGHZQeTWY6t8QswmO0XLf3GqfeardX0pknlY5PvUzkDH9Ndj5T6RbesOrLvVWMKyYhH9I7VUGbOSTk1yNkGkyDK5ztHkmoZI364xrjxitIBeKs0W0Ehx90jwas+m9QavquhWmlanCjJZvmGRslzUBpsYuJdyjKDz4qwRRmNRgfpUNt7jFwLGJ6VC3IWTNeCz9MdRahoN2lzZTFdp+dCflYexFX3r/4nWsnSIuLOb0WaP+bg4YNj7orIJfkQc8mmeq2Ueo2JtpWIGdyn2NDFz7KE4b6Za9V9DozpRta+aP8Az+zM/wCotUm1K6e5nZgjOT/6j70fQLTEXquMFua6+0yWLUUsZV78lvG2pQMkShEAAFPlPaKePQ1a5S9j3Zk0/t/GKY7g3NP7UgAVA9mzX0PFbIpRfaOaCzhBn9qc3GnXEei22sFkNvcSvGoB5Vl96Ci2PlZGLSb8kffSn0mOPFNOlPUlimkAKl5Tg+w9691V8W7fUYqS0aAQWscKjAIAahvSDpyuT9kO1Ukehbj8T706t7KKIh3G5vc0RNkSnGBQZHlmbg7V9qhcjRiloLJcRRjaihvypP8AzMqFpGEcft2pccUUCiSUg0x1K/aQlVwF8CglsLehN5cRxrsQ5qPJkmPJ/ClwwyXEnygsTUtb20NmN87Bn8KKdvRF2/IjTrDaokl4/Gl6jqSQxmKHk+TTTUNQd/lU4X6Uyhha4ehr3Y2dmvlgLtzJczbmHFSUa7OKVBb+lGBgV5g5psmNimvIrPmiLuIzQs4pUbrt74qMds+lpSd1ew966urqmeERMo+Nd7dR3RhSZlj4GB7YzVW6F51WQn+pFJ+pxXV1UJHUSX5C/wDFGkNGk9pslQOpXkGs61l2gu5I4mKqGOB3rq6myKFJDtJI7Hc5NR11LJ6jLvOPaurqiZYRWOqZJAI8O361CozFMkmurq0sf9NGNmfrMuXScES28MwjHqFhlqmOrgFX5QBx4rq6qWT+ojUx/wBIhdCd0u2CMQCpzRruWRb9drkbu/1rq6oJfWzp/T+8VfyAspZF1ORFchcZxUrJLJu++a6upszQxfpf8iPVk3/fNMdXmk4+c966upQ8hyPoIe2ZpNY09XYkG7j8481O9UkzanqBlJchzgmurqsGPD6/9iqWzHcee1SMJJAzXV1PJq/I9tQGfB5FMdelkVhGrkKSOBXV1BeGPsLLoKIkKqqgDaDUqvD8V1dWdM6vG/TQifk80M9q6uqFk3uM9UjR7OR2UFlXg+RVXFdXVZpM7K6kKUnNSsYAAI74FdXVMM21FnXPDkDwa1u80rT3+FGjFrZcrayzjBI/mf3d+TXV1WcVLcv4Mf1icl8Bp/5v/Riup8tGp7FxVks+MYrq6s+fg6Wr62HPL8804gAz2rq6on4L0SO1SRzIw3HANMrVVeYBxkZrq6ivAyXksFyq29sogUJx4FQt27t3YmurqURT+ka4BPNTGnRoFyFGa6uoS8EVfkdS/dxTaurqi9iSYiTz+FIT7tdXUERSP//Z" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;position:absolute;inset:0;z-index:1;" alt="Luis Alberto Zelaya Moncada">
+        <div class="bio-cathedral-deco">
+          <!-- Catedral de Comayagua silhouette in portrait -->
+          <svg width="260" height="115" viewBox="0 0 260 115" fill="none">
+            <rect x="50" y="42" width="160" height="73" fill="rgba(4,90,98,.65)"/>
+            <ellipse cx="130" cy="42" rx="28" ry="18" fill="rgba(4,90,98,.65)"/>
+            <ellipse cx="78" cy="50" rx="16" ry="11" fill="rgba(4,90,98,.6)"/>
+            <!-- Single asymmetric bell tower (authentic detail) -->
+            <rect x="26" y="8" width="34" height="107" fill="rgba(4,90,98,.75)"/>
+            <ellipse cx="43" cy="8" rx="17" ry="10" fill="rgba(4,90,98,.75)"/>
+            <!-- Famous clock face -->
+            <circle cx="43" cy="34" r="11" fill="rgba(1,20,22,.85)" stroke="rgba(78,205,196,.45)" stroke-width="1.2"/>
+            <circle cx="43" cy="34" r="8"  fill="none" stroke="rgba(212,168,67,.3)" stroke-width="0.8"/>
+            <line x1="43" y1="34" x2="43" y2="26" stroke="rgba(212,168,67,.75)" stroke-width="1.2"/>
+            <line x1="43" y1="34" x2="49" y2="34" stroke="rgba(212,168,67,.65)" stroke-width="1"/>
+            <!-- Bells -->
+            <ellipse cx="35" cy="14" rx="5" ry="3.5" fill="rgba(212,168,67,.3)"/>
+            <ellipse cx="51" cy="14" rx="5" ry="3.5" fill="rgba(212,168,67,.3)"/>
+            <!-- Cathedral dome -->
+            <ellipse cx="205" cy="42" rx="22" ry="14" fill="rgba(4,90,98,.65)"/>
+            <!-- Arched windows -->
+            <rect x="62" y="54" width="12" height="18" rx="6 6 0 0" fill="rgba(78,205,196,.14)"/>
+            <rect x="84" y="54" width="12" height="18" rx="6 6 0 0" fill="rgba(78,205,196,.14)"/>
+            <rect x="160" y="54" width="12" height="18" rx="6 6 0 0" fill="rgba(78,205,196,.14)"/>
+            <rect x="182" y="54" width="12" height="18" rx="6 6 0 0" fill="rgba(78,205,196,.14)"/>
+            <!-- Main portal arch -->
+            <rect x="116" y="70" width="28" height="45" rx="14 14 0 0" fill="rgba(1,16,20,.85)" stroke="rgba(78,205,196,.2)" stroke-width="0.8"/>
+            <!-- Cross -->
+            <line x1="130" y1="0"  x2="130" y2="18" stroke="rgba(212,168,67,.45)" stroke-width="1.5"/>
+            <line x1="122" y1="7" x2="138" y2="7" stroke="rgba(212,168,67,.45)" stroke-width="1.5"/>
+            <!-- Cobblestone plaza base -->
+            <rect x="0" y="98" width="260" height="17" fill="rgba(2,50,56,.55)"/>
+            <line x1="0"  y1="101" x2="260" y2="101" stroke="rgba(78,205,196,.07)" stroke-width="1"/>
+            <line x1="0"  y1="106" x2="260" y2="106" stroke="rgba(78,205,196,.05)" stroke-width="1"/>
+            <!-- Parque Central lamppost -->
+            <rect x="14" y="78" width="3" height="20" fill="rgba(4,90,98,.6)"/>
+            <circle cx="15.5" cy="76" r="4" fill="rgba(212,168,67,.45)"/>
+            <rect x="242" y="78" width="3" height="20" fill="rgba(4,90,98,.6)"/>
+            <circle cx="243.5" cy="76" r="4" fill="rgba(212,168,67,.45)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="bio-name-plate">
+        <p>Luis Alberto Zelaya Moncada</p>
+        <span>Escritor &bull; Educador &bull; Motociclista</span>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Biografía del Autor</span>
+      <h2 class="sec-title">Un hombre que encontró<br>sabiduría en el camino</h2>
+      <p class="sec-body"><strong>Luis Alberto Zelaya Moncada</strong> nació el 12 de febrero de 1983 en América Central. Desde muy joven combinó su pasión por la motocicleta con una vocación profunda por la <strong>educación y la tecnología</strong>. Con más de dos décadas de experiencia en educación a distancia — desde 2005 — se convirtió en un puente entre el conocimiento formal y el aprendizaje cotidiano.</p>
+      <p class="sec-body" style="margin-top:14px">Su experiencia como motociclista no fue solo un hobby: fue el laboratorio donde observó, meditó y sistematizó principios que más tarde aplicó a cada área de su vida. <strong>"Enseñanzas en el Camino de la Vida"</strong>, publicado en 2021 por la Biblioteca Nacional de Honduras e ilustrado por Freddy Alexander Ortiz, es la síntesis de esa reflexión.</p>
+      <p class="sec-body" style="margin-top:14px">Con visión social, dispuso que cada ejemplar vendido contribuya a dotar de dispositivos tecnológicos a <strong>estudiantes hondureños de escasos recursos</strong>, convirtiendo su libro en acto de servicio genuino.</p>
+      <div class="bio-data">
+        <div class="bio-data-item"><div class="bio-data-label">Nacimiento</div><div class="bio-data-val">12 febrero 1983</div></div>
+        <div class="bio-data-item"><div class="bio-data-label">Publicación</div><div class="bio-data-val">2021, Honduras</div></div>
+        <div class="bio-data-item"><div class="bio-data-label">Educación a distancia</div><div class="bio-data-val">Desde 2005</div></div>
+        <div class="bio-data-item"><div class="bio-data-label">Ilustrador</div><div class="bio-data-val">Freddy A. Ortiz</div></div>
+        <div class="bio-data-item"><div class="bio-data-label">Editorial</div><div class="bio-data-val">Bibl. Nacional HN</div></div>
+        <div class="bio-data-item"><div class="bio-data-label">Impacto social</div><div class="bio-data-val">Tecnología educativa</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;margin:64px auto 0">
+    <span class="sec-label">Arquitectura del Libro</span>
+    <h2 class="sec-title" style="margin-bottom:32px">Estructura interna y externa</h2>
+    <div class="estructura-grid">
+      <div class="estructura-box">
+        <h4>Estructura Externa</h4>
+        <ul class="estructura-list">
+          <li>Portada y diseño a cargo de Freddy Alexander Ortiz</li>
+          <li>Publicado por la Biblioteca Nacional de Honduras</li>
+          <li>Disponible en formato impreso y edición Kindle</li>
+          <li>Traducción al inglés: Teachings on the Way of Life</li>
+          <li>Traductores: Yennifer Rivera López, Rhett Cookson y Fernando Valladares</li>
+          <li>Capítulos organizados como etapas de un viaje en moto</li>
+          <li>Ilustraciones que refuerzan cada principio del camino</li>
+        </ul>
+      </div>
+      <div class="estructura-box">
+        <h4>Estructura Interna</h4>
+        <ul class="estructura-list">
+          <li>Premisa central: la moto como metáfora de la vida</li>
+          <li>Eje personal: autoconocimiento y propósito individual</li>
+          <li>Eje profesional: liderazgo, metas y desempeño</li>
+          <li>Eje familiar: vínculos, responsabilidad y legado</li>
+          <li>Eje empresarial: visión, riesgo y toma de decisiones</li>
+          <li>Eje espiritual: fe, valores y trascendencia</li>
+          <li>Capítulo del equilibrio: eje central que une todos los demás</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- QUOTE -->
+<section id="quote-section">
+  <div class="quote-inner">
+    <blockquote>Así como el motociclista que pierde el equilibrio cae, quien no equilibra su vida personal, profesional y espiritual <em>pierde el rumbo del camino.</em></blockquote>
+    <div class="q-attr">Luis Alberto Zelaya Moncada &mdash; Enseñanzas en el Camino de la Vida</div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PRINCIPIOS -->
+<section id="principios">
+  <div class="prin-wrap">
+    <span class="sec-label">Del Manillar a la Vida</span>
+    <h2 class="sec-title">Principios del camino</h2>
+    <div class="prin-item">
+      <div class="prin-icon"><svg viewBox="0 0 28 28" fill="none" width="26" height="26"><circle cx="14" cy="14" r="10" stroke="#4ecdc4" stroke-width="1.5"/><path d="M14 8 L14 14 L18 16" stroke="#4ecdc4" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="prin-content"><h3>Prepárate antes de arrancar</h3><p>El motociclista revisa su equipo antes de salir. En la vida, la planificación y la preparación son el pre-viaje que decide si llegas o no al destino.</p><span class="prin-tag">Pre-viaje &rarr; Planificación</span></div>
+    </div>
+    <div class="prin-item">
+      <div class="prin-icon"><svg viewBox="0 0 28 28" fill="none" width="26" height="26"><path d="M4 14 Q10 6 14 14 Q18 22 24 14" stroke="#4ecdc4" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="14" cy="14" r="3" fill="#4ecdc4"/></svg></div>
+      <div class="prin-content"><h3>Domina las curvas, no las temas</h3><p>Frenar antes, inclinarse con decisión, acelerar al salir. Las adversidades piden la misma técnica: anticipar, adaptarse y retomar el impulso.</p><span class="prin-tag">Curva &rarr; Adversidad</span></div>
+    </div>
+    <div class="prin-item">
+      <div class="prin-icon"><svg viewBox="0 0 28 28" fill="none" width="26" height="26"><path d="M4 22 L14 4 L24 22" stroke="#4ecdc4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="7" y1="17" x2="21" y2="17" stroke="#4ecdc4" stroke-width="1.5"/></svg></div>
+      <div class="prin-content"><h3>Mira el horizonte, no la rueda</h3><p>La visión de largo plazo determina la trayectoria. El rider que mira solo lo inmediato pierde estabilidad; quien ve lejos, conduce con propósito.</p><span class="prin-tag">Horizonte &rarr; Visión</span></div>
+    </div>
+    <div class="prin-item">
+      <div class="prin-icon"><svg viewBox="0 0 28 28" fill="none" width="26" height="26"><circle cx="14" cy="14" r="11" stroke="#4ecdc4" stroke-width="1.5"/><path d="M10 14 L13 17 L18 11" stroke="#4ecdc4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="prin-content"><h3>Conoce tus frenos</h3><p>Saber cuándo detenerse es tan vital como saber acelerar. Reconocer límites y pedir ayuda no es debilidad: es autoconocimiento en acción.</p><span class="prin-tag">Frenos &rarr; Autoconocimiento</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FOOTER with Comayagua skyline -->
+<footer>
+  <div class="footer-skyline">
+    <svg width="520" height="55" viewBox="0 0 520 55" fill="none">
+      <!-- Iglesia La Merced (oldest) -->
+      <rect x="15" y="22" width="52" height="33" fill="#4ecdc4"/>
+      <rect x="30" y="9"  width="22" height="17" fill="#4ecdc4"/>
+      <ellipse cx="41" cy="9" rx="11" ry="7" fill="#4ecdc4"/>
+      <line x1="41" y1="0" x2="41" y2="8" stroke="#4ecdc4" stroke-width="1.5"/>
+      <line x1="36" y1="3" x2="46" y2="3" stroke="#4ecdc4" stroke-width="1.5"/>
+      <!-- Iglesia San Francisco -->
+      <rect x="88" y="27" width="44" height="28" fill="#4ecdc4"/>
+      <rect x="102" y="14" width="16" height="17" fill="#4ecdc4"/>
+      <ellipse cx="110" cy="14" rx="8" ry="5" fill="#4ecdc4"/>
+      <!-- Catedral Inmaculada Concepción (main, with asymmetric left tower) -->
+      <rect x="152" y="16" width="110" height="39" fill="#4ecdc4"/>
+      <!-- Single left bell tower -->
+      <rect x="144" y="0"  width="30" height="55" fill="#4ecdc4"/>
+      <ellipse cx="159" cy="0" rx="15" ry="9" fill="#4ecdc4"/>
+      <!-- Clock circle -->
+      <circle cx="159" cy="20" r="8" fill="rgba(1,32,36,.6)" stroke="#4ecdc4" stroke-width="0.8"/>
+      <!-- Dome -->
+      <ellipse cx="207" cy="22" rx="24" ry="15" fill="#4ecdc4"/>
+      <ellipse cx="235" cy="28" rx="14" ry="9"  fill="#4ecdc4"/>
+      <!-- Iglesia San Sebastián -->
+      <rect x="286" y="24" width="48" height="31" fill="#4ecdc4"/>
+      <rect x="300" y="11" width="20" height="17" fill="#4ecdc4"/>
+      <ellipse cx="310" cy="11" rx="10" ry="7" fill="#4ecdc4"/>
+      <!-- Palacio Municipal (arched colonnade) -->
+      <rect x="356" y="28" width="64" height="27" fill="#4ecdc4"/>
+      <ellipse cx="370" cy="28" rx="9" ry="6" fill="#4ecdc4"/>
+      <ellipse cx="388" cy="28" rx="9" ry="6" fill="#4ecdc4"/>
+      <ellipse cx="406" cy="28" rx="9" ry="6" fill="#4ecdc4"/>
+      <!-- Caxa Real -->
+      <rect x="438" y="26" width="58" height="29" fill="#4ecdc4"/>
+      <rect x="457" y="12" width="20" height="18" fill="#4ecdc4"/>
+      <ellipse cx="467" cy="12" rx="10" ry="7" fill="#4ecdc4"/>
+    </svg>
+  </div>
+  <p><span>Enseñanzas en el Camino de la Vida</span> &bull; Luis Alberto Zelaya Moncada &bull; Biblioteca Nacional de Honduras, 2021 &bull; Ilustraciones: Freddy Alexander Ortiz</p>
+  <p style="margin-top:8px;font-size:11px;color:rgba(78,205,196,.18);letter-spacing:3px">COMAYAGUA, HONDURAS &bull; ANTIGUA CAPITAL DE LA REPÚBLICA &bull; FUNDADA 1537</p>
+</footer>
+
+<div id="vignette"></div>
+
+<script>
+/* STARS */
+const starsEl=document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2.2+0.4;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*62}%;width:${sz}px;height:${sz}px;--d:${(Math.random()*3+1.5).toFixed(1)}s;--dl:${(Math.random()*4).toFixed(1)}s;--a1:${(Math.random()*0.2+0.04).toFixed(2)};--a2:${(Math.random()*0.5+0.25).toFixed(2)}`;
+  starsEl.appendChild(s);
+}
+
+/* COMAYAGUA REAL-TIME CLOCK */
+function updateClock(){
+  const now=new Date();
+  const hr=now.getHours()%12, mn=now.getMinutes();
+  document.getElementById('hand-hr').style.transform=`rotate(${hr*30+mn*0.5}deg)`;
+  document.getElementById('hand-mn').style.transform=`rotate(${mn*6}deg)`;
+}
+updateClock();setInterval(updateClock,1000);
+
+/* COMAYAGUA COLONIAL BUILDINGS */
+function comayaguaBuilding(w,h,col,dark){
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width',w);svg.setAttribute('height',h);
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  svg.style.cssText='display:block;flex-shrink:0';
+  const body=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  body.setAttribute('x','1');body.setAttribute('y','0');
+  body.setAttribute('width',w-2);body.setAttribute('height',h);
+  body.setAttribute('fill',col);svg.appendChild(body);
+  const corn=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  corn.setAttribute('x','0');corn.setAttribute('y','0');
+  corn.setAttribute('width',w);corn.setAttribute('height','8');
+  corn.setAttribute('fill',dark);svg.appendChild(corn);
+  const rnd=Math.random();
+  if(rnd>0.7 && w>80){
+    // Cathedral-style: asymmetric left tower
+    const tw=Math.floor(w*0.22), tx=Math.floor(w*0.08), th=Math.floor(h*0.45);
+    const twr=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    twr.setAttribute('x',tx);twr.setAttribute('y',-th);twr.setAttribute('width',tw);twr.setAttribute('height',th+6);twr.setAttribute('fill',dark);svg.appendChild(twr);
+    const ta=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    ta.setAttribute('cx',tx+tw/2);ta.setAttribute('cy',-th);ta.setAttribute('rx',tw/2);ta.setAttribute('ry',10);ta.setAttribute('fill',dark);svg.appendChild(ta);
+    const tc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    const cx=tx+tw/2, cy=-th+tw*0.6;
+    tc.setAttribute('cx',cx);tc.setAttribute('cy',cy);tc.setAttribute('r',tw*0.28);tc.setAttribute('fill','rgba(1,20,22,.9)');tc.setAttribute('stroke','rgba(78,205,196,.4)');tc.setAttribute('stroke-width','1');svg.appendChild(tc);
+    const ch1=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ch1.setAttribute('x1',cx);ch1.setAttribute('y1',cy);ch1.setAttribute('x2',cx);ch1.setAttribute('y2',cy-tw*0.2);ch1.setAttribute('stroke','rgba(212,168,67,.7)');ch1.setAttribute('stroke-width','1.2');svg.appendChild(ch1);
+    const ch2=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ch2.setAttribute('x1',cx);ch2.setAttribute('y1',cy);ch2.setAttribute('x2',cx+tw*0.2);ch2.setAttribute('y2',cy);ch2.setAttribute('stroke','rgba(212,168,67,.6)');ch2.setAttribute('stroke-width','1');svg.appendChild(ch2);
+    [tw*0.28,tw*0.72].forEach(bx=>{const b=document.createElementNS('http://www.w3.org/2000/svg','ellipse');b.setAttribute('cx',tx+bx);b.setAttribute('cy',-th+6);b.setAttribute('rx',tw*0.14);b.setAttribute('ry',4);b.setAttribute('fill','rgba(212,168,67,.25)');svg.appendChild(b)});
+    const dm=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    dm.setAttribute('cx',w/2);dm.setAttribute('cy','2');dm.setAttribute('rx',w*0.2);dm.setAttribute('ry',12);dm.setAttribute('fill',dark);svg.appendChild(dm);
+  } else if(rnd>0.45 && w>50){
+    // Smaller church with center tower + cross
+    const tw2=Math.floor(w*0.28), tx2=Math.floor(w/2-tw2/2), th2=Math.floor(h*0.32);
+    const twr2=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    twr2.setAttribute('x',tx2);twr2.setAttribute('y',-th2);twr2.setAttribute('width',tw2);twr2.setAttribute('height',th2+4);twr2.setAttribute('fill',dark);svg.appendChild(twr2);
+    const ta2=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    ta2.setAttribute('cx',tx2+tw2/2);ta2.setAttribute('cy',-th2);ta2.setAttribute('rx',tw2/2);ta2.setAttribute('ry',8);ta2.setAttribute('fill',dark);svg.appendChild(ta2);
+    const cv=document.createElementNS('http://www.w3.org/2000/svg','line');
+    cv.setAttribute('x1',tx2+tw2/2);cv.setAttribute('y1',-th2-10);cv.setAttribute('x2',tx2+tw2/2);cv.setAttribute('y2',-th2+4);cv.setAttribute('stroke','rgba(78,205,196,.45)');cv.setAttribute('stroke-width','1.5');svg.appendChild(cv);
+    const ch=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ch.setAttribute('x1',tx2+tw2/2-5);ch.setAttribute('y1',-th2-4);ch.setAttribute('x2',tx2+tw2/2+5);ch.setAttribute('y2',-th2-4);ch.setAttribute('stroke','rgba(78,205,196,.45)');ch.setAttribute('stroke-width','1.5');svg.appendChild(ch);
+  } else if(rnd>0.25){
+    // Casona / Palacio with arched colonnade
+    const ac=Math.max(2,Math.floor(w/22)), aw=Math.floor(w/ac);
+    for(let a=0;a<ac;a++){
+      const ax=a*aw, ay=h-20;
+      const ar=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      ar.setAttribute('x',ax+3);ar.setAttribute('y',ay);ar.setAttribute('width',aw-6);ar.setAttribute('height',20);ar.setAttribute('fill',dark);svg.appendChild(ar);
+      const at=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      at.setAttribute('cx',ax+aw/2);at.setAttribute('cy',ay);at.setAttribute('rx',(aw-6)/2);at.setAttribute('ry',6);at.setAttribute('fill',dark);svg.appendChild(at);
+    }
+  }
+  // Arched windows
+  const cols=Math.max(1,Math.floor((w-14)/22)), rows=Math.floor((h-28)/28);
+  const gx=Math.floor((w-cols*12)/(cols+1));
+  for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){
+    const wx=gx+c*(12+gx), wy=14+r*28;
+    if(wy+18>h-22) continue;
+    const lit=Math.random()>0.46;
+    const win=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    win.setAttribute('x',wx);win.setAttribute('y',wy+5);win.setAttribute('width','12');win.setAttribute('height','13');win.setAttribute('fill',lit?'rgba(212,168,67,.72)':'rgba(1,20,22,.9)');svg.appendChild(win);
+    const top=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    top.setAttribute('cx',wx+6);top.setAttribute('cy',wy+5);top.setAttribute('rx','6');top.setAttribute('ry','5');top.setAttribute('fill',lit?'rgba(212,168,67,.72)':'rgba(1,20,22,.9)');svg.appendChild(top);
+    if(lit&&Math.random()>0.72){win.style.animation=`twinkle ${(Math.random()*4+2).toFixed(1)}s ease-in-out infinite alternate`;win.style.setProperty('--a1','0.4');win.style.setProperty('--a2','0.85');}
+  }}
+  // Lamp posts
+  if(Math.random()>0.58){
+    const lx=Math.floor(Math.random()*(w-16)+6);
+    const lp=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    lp.setAttribute('x',lx);lp.setAttribute('y',h-28);lp.setAttribute('width','3');lp.setAttribute('height','28');lp.setAttribute('fill','rgba(4,90,98,.7)');svg.appendChild(lp);
+    const lg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    lg.setAttribute('cx',lx+1.5);lg.setAttribute('cy',h-30);lg.setAttribute('r','4');lg.setAttribute('fill','rgba(212,168,67,.55)');svg.appendChild(lg);
+  }
+  return svg;
+}
+
+function buildLayer(id,cfg){
+  const el=document.getElementById(id);
+  for(let p=0;p<2;p++){let x=0;while(x<window.innerWidth+350){const w=Math.floor(Math.random()*(cfg.maxW-cfg.minW)+cfg.minW),h=Math.floor(Math.random()*(cfg.maxH-cfg.minH)+cfg.minH);el.appendChild(comayaguaBuilding(w,h,cfg.col,cfg.dark));x+=w+2;}}
+}
+buildLayer('city-far',  {minW:35,maxW:70, minH:70, maxH:148,col:'#011c22',dark:'#010e12'});
+buildLayer('city-mid',  {minW:55,maxW:95, minH:95, maxH:200,col:'#022028',dark:'#011218'});
+buildLayer('city-near', {minW:75,maxW:145,minH:130,maxH:265,col:'#032830',dark:'#011820'});
+
+/* ROAD */
+const roadEl=document.getElementById('road');
+for(let i=0;i<24;i++){const d=document.createElement('div');d.className='dash';d.style.left=(i*95)+'px';d.style.animationDelay=(i*-0.022)+'s';roadEl.appendChild(d);}
+for(let i=0;i<8;i++){const lp=document.createElement('div');lp.className='lamp-post';lp.style.cssText=`left:${i*14+2}%;height:${55+Math.floor(Math.random()*10)}px`;roadEl.appendChild(lp);}
+for(let i=0;i<10;i++){const sl=document.createElement('div');sl.className='speedline';sl.style.cssText=`width:${Math.floor(Math.random()*100+50)}px;top:${Math.floor(Math.random()*80+8)}px;--sld:${(Math.random()*0.28+0.22).toFixed(2)}s;--slDl:${(Math.random()*0.5).toFixed(2)}s;animation-iteration-count:infinite`;roadEl.appendChild(sl);}
+
+/* EXHAUST */
+const scene=document.getElementById('scene');
+function spawnEx(){const p=document.createElement('div');p.className='exh';const r=scene.getBoundingClientRect(),sz=Math.floor(Math.random()*7+4);p.style.cssText=`width:${sz}px;height:${sz}px;left:${r.left+14}px;bottom:${window.innerHeight-r.bottom+28}px;--exd:${(Math.random()*0.3+0.42).toFixed(2)}s;--exy:${(Math.random()*14-7).toFixed(0)}px`;document.body.appendChild(p);setTimeout(()=>p.remove(),700);}
+setInterval(spawnEx,80);
+
+/* HUD */
+const spdEl=document.getElementById('spd'),rpmEl=document.getElementById('rpm-val');
+setInterval(()=>{spdEl.textContent=132+Math.floor(Math.random()*10);rpmEl.textContent=(7900+Math.floor(Math.random()*500)).toLocaleString();},220);
+</script>
 </body>
 </html>
